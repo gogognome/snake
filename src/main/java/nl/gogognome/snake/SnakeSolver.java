@@ -24,11 +24,17 @@ public class SnakeSolver {
 		simulatedAnnealing.findSolution(initialState,
 				(state, bestState) -> getNeighbour(state, bestState),
 				(state) -> calcEnergy(state),
-				(bestState, bestEnergy) -> primeSnakeSolver.solve(formatSnake(bestState), maxNum));
+				(bestState, bestEnergy) -> showBestSolution(maxNum, bestState));
+	}
+
+	private void showBestSolution(int maxNum, boolean[] bestState) {
+		String solution = formatSnake(bestState);
+		System.out.println(solution);
+		primeSnakeSolver.solve(solution, maxNum);
 	}
 
 	private void initWithValidSnake(boolean[] state) {
-		String validSolution = "RLLLRRLLRLRLLRRRRLLRLRLRLLRLRRLLRRLRRRLLRLLRRLLRRLLRRLLRRLLRLRRRLLRLRRLLLRLRRRLLRRLLRRLRLLRLLRLRLRRRLLLRLRLRRLLLRRLRLLLRRRLLRRLRRLRLRRLLRRLLRLRLRRLRLRRLLRRLLLRLRLRLLLRRRLLRRRLLRLRLLLRLRRLRRLRRLRLLRRRLRLRLLLRLRRLLRLLRRLRRLRRLRRLLLRRLLRRLLRLRLLRLLRRLLRRRLRLRLRLRLRLRLRRRLRLLRLRLLRLRRLLLRLRLRRLRRLLRRLLRRLRLRLRRLLRLRLRLRRLLLRLRLRRLLRLLLRRLRLRRLLRRLRLRLLRRRLLRRLRLLRLRRRLRLLRRLRLRLLLRRRLRLRLRRRLLRRLLLRLRLRLRRLRRLRLLRRLLRLLRLRLRLRLRRLRRLLRLLLRLRRRLRLLRLLRRLLRLRLLRRLLLRRLRLRLRRLLRLLRRRRLLRRLRRLRRLLRLLLRRLRRLLRLRLLRRRLLRLLLRRLRLLRLRRRLLLRLRRRLRLRLRRLRLLRLLRLLRRRLLLRRLLLLRRRLRLRRLRRLLRLRLLRLLRRLRLRLRRRLLRLLLRRLLLRRLRRLRLRLRRLLRLLRLRLLRRRLLRLLRLRLRRLLRLRLRRRLRLLRRLLRLLRLLL";
+		String validSolution = "RLRRLRRLRLLRLRLLRLRLLRRLRLRLRLLRLLLRRLRRRLRLRLRLLRRLLRLLLRLRRLRLRRLRRRLLRLRLRRLLRRLRLRLLRRLLLRLRRLLLRRRLRLLRLLRLRRLLRRRLLLRRLRLRRRLLRRLLRRLRLLRRLRLRRLLRLRRLLLRLRLRLLLRRRLLRRRLRLRLLLRLRLRLRRLRRLRLRLLLRLRLRRRLRLRLRLLLRRLRRLRRLRLRLLRRLLRRLLRLRLLRLLRRLLRRRRLLRLRLRLLRRLRRRLRLLRLRRLLLRLRLLLRLRRRRLRLRLLRRLRLLRLRLLRRRLLRRLRLRLRLRLRLRLLRLLLRRLRRLLRRLLRRLLRRRLRLLRRLRLLRLRRRLLRRLRLRLLRRRLLRLRLRRLLRLLRRLRRLLRLRRLRLRRLRLLRRLLRLLRLRLRLRLRRLRRLLRLLLRLRRRLRLLLRRLLRRLLRLRLLRLRRRLLLRLRRLLRLLRRRRLRLRLRRRLLRLRLLLRRLRRLLRLRLLRRLRLRLLRLLRLRRLRLLLRRRLRLRRLRLRLRLRRLLRLLRLRLLLRRRLLRRRLRLLRLRLRRLLLRLLRLRRLRRLLRRLRLLLRLLRRLLRRRRLLLRLRLLRRLLRRRLLRRLRRLRLLRLRLRRLLRRRLLRLLLRLRLRLLRRRLRLRLRR";
 		for (int i=0; i<state.length; i++) {
 			state[i] = validSolution.charAt(i) == 'R';
 		}
@@ -40,17 +46,39 @@ public class SnakeSolver {
 			return switchAtLeastTwoTurns(state);
 		}
 		if (diceRoll < 97) {
-			return createNewRandomSnake(state);
+			return invertSubsequentTurns(state);
 		}
 		if (diceRoll < 98) {
-			return switchAtLeastOneSubsequentTurns(state);
+			return createNewRandomSnake(state);
 		}
 		return bestState;
 	}
 
-	private boolean[] switchAtLeastOneSubsequentTurns(boolean[] state) {
+	private int calcEnergy(boolean[] state) {
+		return snake.calcBoundingSquareSize(state);
+	}
+
+	private String formatSnake(boolean[] state) {
+		StringBuilder sb = new StringBuilder(state.length);
+		for (int i=0; i<state.length; i++) {
+			sb.append(state[i] ? 'R' : 'L');
+		}
+		return sb.toString();
+	}
+
+	private boolean[] switchAtLeastTwoTurns(boolean[] state) {
 		boolean[] newState = state.clone();
-		int nrSwitches = random.nextInt(10) + 1;
+		int nrSwitches = random.nextInt(4) + 2;
+		for (int i=0; i<nrSwitches; i++) {
+			int index = random.nextInt(state.length);
+			newState[index] = !newState[index];
+		}
+		return newState;
+	}
+
+	private boolean[] invertSubsequentTurns(boolean[] state) {
+		boolean[] newState = state.clone();
+		int nrSwitches = random.nextInt(100) + 1;
 		int index = random.nextInt(state.length - (nrSwitches-1));
 		for (int i=0; i<nrSwitches; i++) {
 			newState[index] = !newState[index];
@@ -86,28 +114,6 @@ public class SnakeSolver {
 			}
 		} catch (IndexOutOfBoundsException e) {
 			// this exception is a trick to end the loops
-		}
-		return newState;
-	}
-
-	private int calcEnergy(boolean[] state) {
-		return snake.calcBoundingSquareSize(state);
-	}
-
-	private String formatSnake(boolean[] state) {
-		StringBuilder sb = new StringBuilder(state.length);
-		for (int i=0; i<state.length; i++) {
-			sb.append(state[i] ? 'R' : 'L');
-		}
-		return sb.toString();
-	}
-
-	private boolean[] switchAtLeastTwoTurns(boolean[] state) {
-		boolean[] newState = state.clone();
-		int nrSwitches = random.nextInt(4) + 2;
-		for (int i=0; i<nrSwitches; i++) {
-			int index = random.nextInt(state.length);
-			newState[index] = !newState[index];
 		}
 		return newState;
 	}
