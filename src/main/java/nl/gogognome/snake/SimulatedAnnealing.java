@@ -94,10 +94,14 @@ public class SimulatedAnnealing {
 					newState[index++] = firstTurnOfStraight;
 				}
 
-				boolean turn = (turnIndex % 4) < 2;
-				newState[index++] = turn;
-				turnIndex++;
-				firstTurnOfStraight = !turn;
+				if (random.nextBoolean()) {
+					boolean turn = (turnIndex % 4) < 2;
+					newState[index++] = turn;
+					turnIndex++;
+					firstTurnOfStraight = !turn;
+				} else {
+					turnIndex += 2;
+				}
 			}
 		} catch (IndexOutOfBoundsException e) {
 			// this exception is a trick to end the loops

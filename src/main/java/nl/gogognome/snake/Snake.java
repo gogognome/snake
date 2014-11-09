@@ -26,6 +26,7 @@ public class Snake {
 		int y = 0;
 		int direction = 0;
 		Set<Point> positions = new HashSet<>();
+		positions.add(new Point(x, y));
 
 		int index = 0;
 		while (positions.size() < maxLen && index <= maxIndex) {
