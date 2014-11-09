@@ -70,7 +70,7 @@ public class SimulatedAnnealing {
 	private boolean[] getNeighbour(boolean[] state) {
 		int diceRoll = random.nextInt(100);
 		if (diceRoll < 40) {
-			return switchTwoSubsequentTurns(state);
+			return switchAtLeastTwoTurns(state);
 		}
 		if (diceRoll < 97) {
 			return createNewRandomSnake(state);
@@ -116,12 +116,13 @@ public class SimulatedAnnealing {
 		return newState;
 	}
 
-	private boolean[] switchTwoSubsequentTurns(boolean[] state) {
+	private boolean[] switchAtLeastTwoTurns(boolean[] state) {
 		boolean[] newState = state.clone();
-		int index = random.nextInt(state.length-1);
-		newState[index] = !newState[index];
-		newState[index+1] = !newState[index+1];
+		int nrSwitches = random.nextInt(4) + 2;
+		for (int i=0; i<nrSwitches; i++) {
+			int index = random.nextInt(state.length);
+			newState[index] = !newState[index];
+		}
 		return newState;
 	}
-
 }
