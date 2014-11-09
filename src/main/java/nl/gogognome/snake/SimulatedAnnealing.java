@@ -31,12 +31,16 @@ public class SimulatedAnnealing<S> {
 
 		long k = 0;
 		while (k < Long.MAX_VALUE) {
-			double temperature = 1.0/k;
+			double temperature = Math.min(1.0, 1.0/((double) (k)/(double) Integer.MAX_VALUE));
 			S newState = neighbour.getNeighbour(state, bestState);
 			int newEnergy = energyCalc.calcEnergy(newState);
-			if (probability(energy, newEnergy, temperature) > random.nextDouble()) {
+			double transitionProbability = probability(energy, newEnergy, temperature);
+			if (transitionProbability > random.nextDouble()) {
 				state = newState;
 				energy = newEnergy;
+				if (energy < newEnergy) {
+					System.out.println("New energy: " + newEnergy);
+				}
 			}
 			if (newEnergy < bestEnergy) {
 				bestState = newState;
@@ -49,11 +53,11 @@ public class SimulatedAnnealing<S> {
 
 	private double probability(int energy, int newEnergy, double temperature) {
 		if (energy > newEnergy) {
-			return 1.0 - (1.0 / temperature);
+			return 1.0 - (0.1 * temperature);
 		} else if (newEnergy == Integer.MAX_VALUE) {
 			return 0; // never transit to invalid state
 		} else {
-			return (1.0 / (newEnergy - energy)) * temperature;
+			return (energy/newEnergy) * 0.2 * temperature;
 		}
 	}
 }

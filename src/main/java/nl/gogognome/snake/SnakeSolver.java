@@ -19,8 +19,7 @@ public class SnakeSolver {
 
 	public void findSolution(int maxNum) {
 		SimulatedAnnealing<boolean[]> simulatedAnnealing = new SimulatedAnnealing<boolean[]>();
-		boolean[] initialState = new boolean[new Primes(maxNum).getNumberPrimes()];
-		initWithValidSnake(initialState);
+		boolean[] initialState = initWithValidSnake(new Primes(maxNum).getNumberPrimes());
 		simulatedAnnealing.findSolution(initialState,
 				(state, bestState) -> getNeighbour(state, bestState),
 				(state) -> calcEnergy(state),
@@ -33,11 +32,16 @@ public class SnakeSolver {
 		primeSnakeSolver.solve(solution, maxNum);
 	}
 
-	private void initWithValidSnake(boolean[] state) {
+	private boolean[] initWithValidSnake(int numTurns) {
+		boolean[] state = new boolean[numTurns];
+//		do {
+//			state = createNewRandomSnake(state);
+//		} while (snake.calcBoundingSquareSize(state) == Integer.MAX_VALUE);
 		String validSolution = "RLRRLRRLRLLRLRLLRLRLLRRLRLRLRLLRLLLRRLRRRLRLRLRLLRRLLRLLLRLRRLRLRRLRRRLLRLRLRRLLRRLRLRLLRRLLLRLRRLLLRRRLRLLRLLRLRRLLRRRLLLRRLRLRRRLLRRLLRRLRLLRRLRLRRLLRLRRLLLRLRLRLLLRRRLLRRRLRLRLLLRLRLRLRRLRRLRLRLLLRLRLRRRLRLRLRLLLRRLRRLRRLRLRLLRRLLRRLLRLRLLRLLRRLLRRRRLLRLRLRLLRRLRRRLRLLRLRRLLLRLRLLLRLRRRRLRLRLLRRLRLLRLRLLRRRLLRRLRLRLRLRLRLRLLRLLLRRLRRLLRRLLRRLLRRRLRLLRRLRLLRLRRRLLRRLRLRLLRRRLLRLRLRRLLRLLRRLRRLLRLRRLRLRRLRLLRRLLRLLRLRLRLRLRRLRRLLRLLLRLRRRLRLLLRRLLRRLLRLRLLRLRRRLLLRLRRLLRLLRRRRLRLRLRRRLLRLRLLLRRLRRLLRLRLLRRLRLRLLRLLRLRRLRLLLRRRLRLRRLRLRLRLRRLLRLLRLRLLLRRRLLRRRLRLLRLRLRRLLLRLLRLRRLRRLLRRLRLLLRLLRRLLRRRRLLLRLRLLRRLLRRRLLRRLRRLRLLRLRLRRLLRRRLLRLLLRLRLRLLRRRLRLRLRR";
 		for (int i=0; i<state.length; i++) {
 			state[i] = validSolution.charAt(i) == 'R';
 		}
+		return state;
 	}
 
 	private boolean[] getNeighbour(boolean[] state, boolean[] bestState) {
@@ -45,13 +49,10 @@ public class SnakeSolver {
 		if (diceRoll < 30) {
 			return switchAtLeastTwoTurns(state);
 		}
-		if (diceRoll < 97) {
+		if (diceRoll < 60) {
 			return invertSubsequentTurns(state);
 		}
-		if (diceRoll < 98) {
-			return createNewRandomSnake(state);
-		}
-		return bestState;
+		return createNewRandomSnake(state);
 	}
 
 	private int calcEnergy(boolean[] state) {
