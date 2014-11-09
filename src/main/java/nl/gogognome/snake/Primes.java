@@ -11,7 +11,7 @@ public class Primes {
 			primes[i] = true;
 		}
 
-		for (int factor=2; factor*factor<=5000; factor++) {
+		for (int factor=2; factor*factor<=maxNum; factor++) {
 			if (primes[factor]) {
 				for (int n=2*factor; n<primes.length; n += factor) {
 					primes[n] = false;

@@ -21,10 +21,12 @@ public class SimulatedAnnealing {
 
 		boolean[] bestState = state;
 		int bestEnergy = energy;
+		printBestState(bestState, bestEnergy);
+
 		long k = 0;
 		while (k < Long.MAX_VALUE) {
 			double temperature = 1.0/k;
-			boolean[] newState = getNeighbour(state);
+			boolean[] newState = getNeighbour(state, bestState);
 			int newEnergy = calcEnergy(newState);
 			if (probability(energy, newEnergy, temperature) > random.nextDouble()) {
 				state = newState;
@@ -33,15 +35,20 @@ public class SimulatedAnnealing {
 			if (newEnergy < bestEnergy) {
 				bestState = newState;
 				bestEnergy = newEnergy;
-				System.out.println("bounding square: " + bestEnergy + " " + formatSnake(bestState));
+				printBestState(bestState, bestEnergy);
 			}
 			k++;
 		}
 	}
 
+	private void printBestState(boolean[] bestState, int bestEnergy) {
+		System.out.println("bounding square: " + bestEnergy + " " + formatSnake(bestState));
+	}
+
 	private void initWithValidSnake(boolean[] state) {
+		String validSolution = "RLLLRRLLRLRLLRRRRLLRLRLRLLRLRRLLRRLRRRLLRLLRRLLRRLLRRLLRRLLRLRRRLLRLRRLLLRLRRRLLRRLLRRLRLLRLLRLRLRRRLLLRLRLRRLLLRRLRLLLRRRLLRRLRRLRLRRLLRRLLRLRLRRLRLRRLLRRLLLRLRLRLLLRRRLLRRRLLRLRLLLRLRRLRRLRRLRLLRRRLRLRLLLRLRRLLRLLRRLRRLRRLRRLLLRRLLRRLLRLRLLRLLRRLLRRRLRLRLRLRLRLRLRRRLRLLRLRLLRLRRLLLRLRLRRLRRLLRRLLRRLRLRLRRLLRLRLRLRRLLLRLRLRRLLRLLLRRLRLRRLLRRLRLRLLRRRLLRRLRLLRLRRRLRLLRRLRLRLLLRRRLRLRLRRRLLRRLLLRLRLRLRRLRRLRLLRRLLRLLRLRLRLRLRRLRRLLRLLLRLRRRLRLLRLLRRLLRLRLLRRLLLRRLRLRLRRLLRLLRRRRLLRRLRRLRRLLRLLLRRLRRLLRLRLLRRRLLRLLLRRLRLLRLRRRLLLRLRRRLRLRLRRLRLLRLLRLLRRRLLLRRLLLLRRRLRLRRLRRLLRLRLLRLLRRLRLRLRRRLLRLLLRRLLLRRLRRLRLRLRRLLRLLRLRLLRRRLLRLLRLRLRRLLRLRLRRRLRLLRRLLRLLRLLL";
 		for (int i=0; i<state.length; i++) {
-			state[i] = (i % 2) == 0;
+			state[i] = validSolution.charAt(i) == 'R';
 		}
 	}
 
@@ -67,15 +74,18 @@ public class SimulatedAnnealing {
 		return snake.calcBoundingSquareSize(state);
 	}
 
-	private boolean[] getNeighbour(boolean[] state) {
+	private boolean[] getNeighbour(boolean[] state, boolean[] bestState) {
 		int diceRoll = random.nextInt(100);
-		if (diceRoll < 40) {
+		if (diceRoll < 30) {
 			return switchAtLeastTwoTurns(state);
 		}
 		if (diceRoll < 97) {
 			return createNewRandomSnake(state);
 		}
-		return switchAtLeastOneSubsequentTurns(state);
+		if (diceRoll < 98) {
+			return switchAtLeastOneSubsequentTurns(state);
+		}
+		return bestState;
 	}
 
 	private boolean[] createNewRandomSnake(boolean[] state) {
@@ -111,7 +121,7 @@ public class SimulatedAnnealing {
 
 	private boolean[] switchAtLeastOneSubsequentTurns(boolean[] state) {
 		boolean[] newState = state.clone();
-		int nrSwitches = random.nextInt(3) + 1;
+		int nrSwitches = random.nextInt(10) + 1;
 		int index = random.nextInt(state.length - (nrSwitches-1));
 		for (int i=0; i<nrSwitches; i++) {
 			newState[index] = !newState[index];

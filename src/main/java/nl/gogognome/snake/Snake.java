@@ -30,15 +30,15 @@ public class Snake {
 
 		int index = 0;
 		while (positions.size() < maxLen && index <= maxIndex) {
-			if (primes.isPrime(positions.size())) {
-				direction = (direction +  (snake[index] ? 1 : (deltaX.length - 1))) % deltaX.length;
-				index++;
-			}
-
 			x += deltaX[direction];
 			y += deltaY[direction];
 			if (!positions.add(new Point(x, y))) {
 				return Integer.MAX_VALUE; // collision detected
+			}
+
+			if (primes.isPrime(positions.size() - 1)) {
+				direction = (direction +  (snake[index] ? 1 : (deltaX.length - 1))) % deltaX.length;
+				index++;
 			}
 		}
 
