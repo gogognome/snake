@@ -75,7 +75,7 @@ public class SimulatedAnnealing {
 		if (diceRoll < 97) {
 			return createNewRandomSnake(state);
 		}
-		return switchOneTurn(state);
+		return switchAtLeastOneSubsequentTurns(state);
 	}
 
 	private boolean[] createNewRandomSnake(boolean[] state) {
@@ -109,10 +109,14 @@ public class SimulatedAnnealing {
 		return newState;
 	}
 
-	private boolean[] switchOneTurn(boolean[] state) {
+	private boolean[] switchAtLeastOneSubsequentTurns(boolean[] state) {
 		boolean[] newState = state.clone();
-		int index = random.nextInt(state.length);
-		newState[index] = !newState[index];
+		int nrSwitches = random.nextInt(3) + 1;
+		int index = random.nextInt(state.length - (nrSwitches-1));
+		for (int i=0; i<nrSwitches; i++) {
+			newState[index] = !newState[index];
+			index++;
+		}
 		return newState;
 	}
 
