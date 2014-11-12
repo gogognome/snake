@@ -15,7 +15,7 @@ public class PrimeSnakeSolver extends JPanel {
 	private static final long serialVersionUID = 1L;
 
 	// Adjust to see more detail
-	private static final int ZOOM = 2;
+	private static final int ZOOM = 1;
 
 	// Set to true to print more information
 	private final boolean DEBUG = false;
@@ -41,9 +41,14 @@ public class PrimeSnakeSolver extends JPanel {
 		repaint();
 	}
 
+	public void show(String solution, int snakeLength) {
+		calculateSolution(solution, snakeLength);
+		repaint();
+	}
+
 	private Snake snake = new Snake();
 
-	private int calculateSolution(String solution, int snakeLength) {
+	private synchronized int calculateSolution(String solution, int snakeLength) {
 		char[] input = solution.toCharArray();
 		List<Integer> primeGaps = sieveGaps(snakeLength);
 
@@ -82,7 +87,7 @@ public class PrimeSnakeSolver extends JPanel {
 	}
 
 	@Override
-	protected void paintComponent(Graphics g) {
+	protected synchronized void paintComponent(Graphics g) {
 
 		// Simple visual for debug purposes, start from the center:
 		Graphics2D g2d = (Graphics2D) g;

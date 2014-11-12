@@ -21,13 +21,14 @@ public class SimulatedAnnealing<S> {
 	public SimulatedAnnealing() {
 	}
 
-	public void findSolution(S initialState, Neighbour<S> neighbour, EnergyCalc<S> energyCalc, Solution<S> solution) {
+	public void findSolution(S initialState, Neighbour<S> neighbour, EnergyCalc<S> energyCalc, Solution<S> optimalSolution,
+			Solution<S> currentSolution) {
 		S state = initialState;
 		int energy = energyCalc.calcEnergy(state);
 
 		S bestState = state;
 		int bestEnergy = energy;
-		solution.foundSolution(bestState, bestEnergy);
+		optimalSolution.foundSolution(bestState, bestEnergy);
 
 		long k = 0;
 		while (k < Long.MAX_VALUE) {
@@ -38,14 +39,12 @@ public class SimulatedAnnealing<S> {
 			if (transitionProbability > random.nextDouble()) {
 				state = newState;
 				energy = newEnergy;
-				if (energy < newEnergy) {
-					System.out.println("New energy: " + newEnergy);
-				}
+				currentSolution.foundSolution(state, energy);
 			}
 			if (newEnergy < bestEnergy) {
 				bestState = newState;
 				bestEnergy = newEnergy;
-				solution.foundSolution(bestState, bestEnergy);
+				optimalSolution.foundSolution(bestState, bestEnergy);
 			}
 			k++;
 		}
@@ -57,7 +56,7 @@ public class SimulatedAnnealing<S> {
 		} else if (newEnergy == Integer.MAX_VALUE) {
 			return 0; // never transit to invalid state
 		} else {
-			return (energy/newEnergy) * 0.2 * temperature;
+			return ((double) energy / (double) newEnergy) * 0.001 * temperature;
 		}
 	}
 }
